@@ -7,8 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+//Adicionando o Contexto ao projeto, configurando para usar MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+    // O AutoDetect descobre automaticamente se a versão do seu MySQL é 8.0, 5.7, etc.
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// 3. Adiciona o filtro de exceções de banco de dados (padrão do template, pode manter se já existir)
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
