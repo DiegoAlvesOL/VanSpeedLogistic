@@ -1,0 +1,80 @@
+@* 1. DEFINIÇÃO DO MODELO 
+   Esta linha conecta o HTML com o C#. Agora o HTML sabe que deve esperar 
+   os campos da classe DeliveryViewModel. 
+*@
+@model VanSpeedLogistics.Models.DeliveryViewModel
+
+@{
+    ViewData["Title"] = "Lançamento Diário";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-truck"></i> Registro Diário</h4>
+                </div>
+                <div class="card-body">
+                    
+                    @* 2. O FORMULÁRIO 
+                       asp-action="Index": Envia os dados para a Action 'Index' (no Controller).
+                       method="post": Envia os dados de forma oculta (padrão para salvar dados).
+                    *@
+                    <form asp-action="Index" method="post">
+                        
+                        <!-- Resumo de Erros (caso o usuário deixe algo em branco) -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Campo: Entregas -->
+                        <div class="mb-3">
+                            <label asp-for="DeliveriesCount" class="form-label fw-bold"></label>
+                            <input asp-for="DeliveriesCount" class="form-control form-control-lg" type="number" />
+                            <span asp-validation-for="DeliveriesCount" class="text-danger"></span>
+                        </div>
+
+                        <!-- Campo: Coletas -->
+                        <div class="mb-3">
+                            <label asp-for="CollectionsCount" class="form-label fw-bold"></label>
+                            <input asp-for="CollectionsCount" class="form-control form-control-lg" type="number" />
+                            <span asp-validation-for="CollectionsCount" class="text-danger"></span>
+                        </div>
+
+                        <!-- Campo: Retornos -->
+                        <div class="mb-3">
+                            <label asp-for="RetournsCount" class="form-label fw-bold"></label>
+                            <input asp-for="RetournsCount" class="form-control form-control-lg" type="number" />
+                            <span asp-validation-for="RetournsCount" class="text-danger"></span>
+                        </div>
+
+                        <!-- Campo: Notas -->
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Ex: Pneu furou, cliente ausente..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <!-- Botão de Salvar -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                Salvar Registro
+                            </button>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@* 3. SCRIPTS DE VALIDAÇÃO 
+   Isso ativa a validação no lado do cliente (Javascript). 
+   O usuário vê o erro antes mesmo de enviar para o servidor.
+*@
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
