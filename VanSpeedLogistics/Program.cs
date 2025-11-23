@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VanSpeedLogistics.Data;
+using VanSpeedLogistics.Models;
+using VanSpeedLogistics.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,21 +10,44 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-//Adicionando o Contexto ao projeto, configurando para usar MySQL
+// 1. Adicionando o Contexto ao projeto, configurando para usar MySQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    // O AutoDetect descobre automaticamente se a versão do seu MySQL é 8.0, 5.7, etc.
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// 3. Adiciona o filtro de exceções de banco de dados (padrão do template, pode manter se já existir)
+// 2. Adiciona o filtro de exceções de banco de dados
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+// >>> CORREÇÃO FINAL 3: ADICIONA O SERVIÇO DE RAZOR PAGES
+builder.Services.AddRazorPages(); 
+
+// 3. Configuração do Identity CORRIGIDA 1: Uso de AddIdentity<ApplicationUser, IdentityRole>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+    })
     .AddEntityFrameworkStores<ApplicationDbContext>();
+    // .AddDefaultUI();
+    // .AddDefaultTokenProviders(); 
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    
+    await DbInitializer.SeedRolesAsync(roleManager);
+    await DbInitializer.SeedUsersAsync(userManager);
+}
+
+
+
+// Configure o pipeline de requisição HTTP (Middleware)
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -30,7 +55,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
