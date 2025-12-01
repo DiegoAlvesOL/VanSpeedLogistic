@@ -1,0 +1,79 @@
+@model VanSpeedLogistics.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register New Driver";
+}
+
+<!-- NOVO: Exibe a mensagem de sucesso se ela existir no TempData -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+        <strong>Success!</strong> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-plus"></i> Register New Driver
+                    </h3>
+                </div>
+                <div class="card-body">
+                    
+                    @* O FORMULÁRIO: aponta para a Action POST (a ser implementada no próximo card) *@
+                    <form asp-controller="Account" asp-action="Register" method="post">
+                        
+                        <!-- asp-validation-summary: Exibe todos os erros de validação da ViewModel -->
+                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                        <!-- Full Name: O Tag Helper <label asp-for> puxa o texto de [Display(Name="Full Name")] na ViewModel -->
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" placeholder="Ex: John Doe" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+                        <!-- O que esse código faz: Cria a caixa de texto e associa a validação ao campo FullName. -->
+                        
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" type="email" placeholder="john.doe@vanspeed.com" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <!-- O que esse código faz: Cria a caixa de texto do Email. -->
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <!-- O que esse código faz: Cria a caixa de senha (ocultando os caracteres). -->
+                        
+                        <!-- Confirm Password -->
+                        <div class="mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                        <!-- O que esse código faz: Cria a caixa de confirmação de senha. -->
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-plus-circle"></i> Create Driver Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

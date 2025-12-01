@@ -5,7 +5,7 @@
 @model VanSpeedLogistics.Models.DeliveryViewModel
 
 @{
-    ViewData["Title"] = "Lançamento Diário";
+    ViewData["Title"] = "Daily Release";
 }
 
 <div class="container mt-4">
@@ -14,7 +14,7 @@
             
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="bi bi-truck"></i> Registro Diário</h4>
+                    <h4 class="mb-0"><i class="bi bi-truck"></i> Daily Log</h4>
                 </div>
                 <div class="card-body">
                     
@@ -51,16 +51,16 @@
                         <!-- Campo: Notas -->
                         <div class="mb-3">
                             <label asp-for="Notes" class="form-label"></label>
-                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Ex: Pneu furou, cliente ausente..."></textarea>
+                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Ex: Flat tire, customer absent..."></textarea>
                             <span asp-validation-for="Notes" class="text-danger"></span>
                         </div>
 
                         <!-- Botão de Salvar -->
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success btn-lg">
-                                Salvar Registro
+                                Save Record
                             </button>
-                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
                         </div>
 
                     </form>
@@ -70,6 +70,67 @@
         </div>
     </div>
 </div>
+
+
+<hr class="my-5" /> <!-- Uma linha divisória para separar visualmente -->
+
+<!-- SEÇÃO DE HISTÓRICO -->
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h4 class="mb-3 text-secondary"><i class="bi bi-clock-history"></i> My Latest Releases</h4>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover shadow-sm border">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Data/Time</th>
+                        <th class="text-center">Deliveries</th>
+                        <th class="text-center">Collections</th>
+                        <th class="text-center">Returns</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @* LÓGICA DE EXIBIÇÃO:
+                       Aqui verificamos se existe algo na ViewBag.History.
+                       Se existir, fazemos um loop (foreach) para criar uma linha (tr)
+                       para cada registro encontrado.
+                    *@
+                    @if (ViewBag.History != null)
+                    {
+                        // Precisamos dizer ao Razor que isso é uma lista de DeliveryRecord
+                        // para ele entender os campos (.Date, .DeliveriesCount, etc)
+                        foreach (var item in (List<VanSpeedLogistics.Models.Entities.DeliveryRecord>)ViewBag.History)
+                        {
+                            <tr>
+                                <!-- Exibe a data formatada (Dia/Mês/Ano Hora:Minuto) -->
+                                <td>@item.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                                
+                                <td class="text-center text-success fw-bold">@item.DeliveriesCount</td>
+                                <td class="text-center text-primary">@item.CollectionsCount</td>
+                                <td class="text-center text-danger">@item.RetournsCount</td>
+                                
+                                <!-- Exibe a nota ou um traço se estiver vazia -->
+                                <td class="text-muted small">
+                                    @(string.IsNullOrEmpty(item.Notes) ? "-" : item.Notes)
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">
+                                No records found.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 
 @* 3. SCRIPTS DE VALIDAÇÃO 
    Isso ativa a validação no lado do cliente (Javascript). 

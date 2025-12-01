@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using VanSpeedLogistics.Data;
 using VanSpeedLogistics.Models;
 using VanSpeedLogistics.Models.Entities;
@@ -26,19 +27,35 @@ public class OperatorController : Controller
         _context = context;
         _userManager = userManager;
     }
-    
+
     /// <summary>
     /// Action Index (GET): Responsável por carregar o formulário de lançamento de dados.
     /// Retorna a View onde o operador irá preencher seus registros diários.
     /// </summary>
     /// <returns>A View contendo o formulário diário de registro.</returns>
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return NotFound("Usuário não encontrado");
+        }
+
+        // Montamos uma consulta SQL usando C# (LINQ)
+        var userHistory = await _context.DeliveryRecords
+            .Where(r => r.DriverId == user.Id)
+            .OrderByDescending(r => r.Date)
+            .Take(10)
+            .ToListAsync();
+        
+        ViewBag.History = userHistory;
+        
         return View();
+
     }
-
-
+    
+    
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Index(DeliveryViewModel model)
