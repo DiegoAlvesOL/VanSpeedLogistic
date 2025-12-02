@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VanSpeedLogistics.Data;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using System;
 using VanSpeedLogistics.Models.ViewModels;
-using System.Linq;
-using VanSpeedLogistics.Models.Entities;
+using ClosedXML.Excel;
+using System.IO;
+
+
 
 
 namespace VanSpeedLogistics.Controllers;
@@ -55,7 +55,6 @@ public class ManagerController : Controller
         
         // Consulta ao Banco de Dados (Cálculo dos KPIs do Dia Anterior)
         // Filtra todos os registros que ocorreram no intervalo do dia anterior
-
         var previousDayRecords = _context.DeliveryRecords
             .Where(r => r.Date >= yesterdayStart && r.Date <= yesterdayEnd);
 
@@ -79,5 +78,64 @@ public class ManagerController : Controller
         
         // Passa a ViewModel preenchida para a View
         return View(viewModel);
+    }
+
+    /// <summary>
+    /// Action que exporta o Log de Atividades completo da Frota para um arquivo Excel (.xlsx) usando ClosedXML.
+    /// </summary>
+    /// <returns>Um arquivo FileContentResult para download do navegador.</returns>
+    [HttpGet]
+    public async Task<IActionResult> ExportToExcel()
+    {
+        var records = await _context.DeliveryRecords
+            .Include(r => r.User)
+            .OrderByDescending(r => r.Date)
+            .ToListAsync();
+
+        using (var workbook = new XLWorkbook())
+        {
+            var worksheet = workbook.Worksheets.Add("Flee Activity Log");
+            // Definição do Cabeçalho
+            worksheet.Cell("A1").Value = "Driver Name";
+            worksheet.Cell("B1").Value = "Registration Date";
+            worksheet.Cell("C1").Value = "Deliveries";
+            worksheet.Cell("D1").Value = "Collections";
+            worksheet.Cell("E1").Value = "Returns";
+            worksheet.Cell("F1").Value = "Notes";
+
+            // Formatação do Cabeçalho
+            var headerRange = worksheet.Range("A1:F1");
+            headerRange.Style.Font.SetBold();
+            headerRange.Style.Fill.BackgroundColor = XLColor.LightGray;
+
+            int currentRow = 2;
+            foreach (var record in records)
+            {
+                worksheet.Cell(currentRow, 1).Value = record.User?.FullName ?? "N/A";
+
+                worksheet.Cell(currentRow, 2).Value = record.Date.ToString("yyyy-MM-dd HH:mm");
+                worksheet.Cell(currentRow, 3).Value = record.Deliveries;
+                worksheet.Cell(currentRow, 4).Value = record.Collections;
+                worksheet.Cell(currentRow, 5).Value = record.Returns;
+                worksheet.Cell(currentRow, 6).Value = record.Notes;
+
+                currentRow++;
+            }
+
+            // Formatação da planilha, ajustando o tamanho das colunas e centralização no caso dos dados nas colunas C:E
+            worksheet.Columns().AdjustToContents();
+            worksheet.Columns("C:E").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+            using (var stream = new MemoryStream())
+            {
+                workbook.SaveAs(stream);
+                var content = stream.ToArray();
+
+                return File(
+                    content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"VanSpeed_Fleet_Report_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx"
+                );
+            }
+        }
     }
 }

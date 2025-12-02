@@ -50,59 +50,66 @@
     </div>
     
     
-    <h2 class="text-xl font-semibold mb-4 text-gray-700">Recent Activity Log</h2>
-    <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-700">Recent Activity Log</h2>
         
+        <a asp-action="ExportToExcel" class="bg-primary text-white font-semibold py-2 px-4 rounded-xl shadow-md hover:bg-primary-dark transition duration-300 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l3-3m-3 3l-3-3m-8 3h18a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v7a2 2 0 002 2z"></path></svg>
+            Export Report (.xlsx)
+        </a>
+    </div>
+    
+    <div class="bg-white p-6 rounded-xl shadow-lg overflow-x-auto">
         @if (Model.RecentActivityLog.Any())
         {
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Driver
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date/Time
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Deliveries
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Collections
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Returns
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Notes
-                        </th>
-                    </tr>
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Driver
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Date/Time
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Deliveries
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Collections
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Returns
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Notes
+                    </th>
+                </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach (var record in Model.RecentActivityLog)
-                    {
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <!-- Uses the FullName of the ApplicationUser (included in the query) -->
-                                @(record.User?.FullName ?? "N/A")
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                @record.Date.ToString("dd/MM/yyyy HH:mm")
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-bold">
-                                @record.Deliveries
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-bold">
-                                @record.Collections
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-bold">
-                                @record.Returns
-                            </td>
-                            <td class="px-6 py-4 whitespace-normal text-sm text-gray-700 max-w-xs">
-                                @(string.IsNullOrWhiteSpace(record.Notes) ? "-" : record.Notes)
-                            </td>
-                        </tr>
-                    }
+                @foreach (var record in Model.RecentActivityLog)
+                {
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <!-- Uses the FullName of the ApplicationUser (included in the query) -->
+                            @(record.User?.FullName ?? "N/A")
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            @record.Date.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-bold">
+                            @record.Deliveries
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-bold">
+                            @record.Collections
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-bold">
+                            @record.Returns
+                        </td>
+                        <td class="px-6 py-4 whitespace-normal text-sm text-gray-700 max-w-xs">
+                            @(string.IsNullOrWhiteSpace(record.Notes) ? "-" : record.Notes)
+                        </td>
+                    </tr>
+                }
                 </tbody>
             </table>
         }
