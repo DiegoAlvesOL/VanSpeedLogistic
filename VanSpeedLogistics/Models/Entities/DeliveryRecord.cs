@@ -1,37 +1,67 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace VanSpeedLogistics.Models.Entities;
 
 /// <summary>
-/// Esta classe representa o Model do formulário diário.
-/// Cada propriedade aqui vai virar um coluna da tabela do MySQL.
+/// Entidade que registra a atividade diária de um operador logístico (driver).
 /// </summary>
 public class DeliveryRecord
 {
-    // O Id é a identificaçZao única de cada registro.
-    // O [Key] avisa ao Banco de Dados que esta é a chave primária (Primary Key).
+    // O Id é a identificaçZao única de cada registro. O [Key] avisa ao Banco de Dados que esta é a chave primária (Primary Key).
     [Key]
     public int Id { get; set; }
     
-    // A Data de quando o trabalho foi realizado.
-    // O DateTime é usado para guardar dia, mês, ano e hora.
+    
+    // A Data de quando o trabalho foi realizado. O DateTime é usado para guardar dia, mês, ano e hora.
+    [Required]
+    [Display(Name = "Date of Registration")]
     public DateTime Date { get; set; }
     
     // Id do motorista que fez esse registro.
-    public string DriverId { get; set;}
+    [Required]
+    public string DriverId { get; set;} = string.Empty;
     
-    // Quantidade de mercadorias entregues com sucesso.
-    public int DeliveriesCount { get; set; }
     
-    // Quantidade de mercadorias recolhidas (Coletas).
-    public int CollectionsCount { get; set; }
     
-    // Quantidade de entregas que falharam (Retornos).
-    public int RetournsCount {  get; set; }
     
-    // Campo opcional para observações (ex: "Pneu furou", "Trânsito intenso").
-    // O ponto de interrogação (string?) indica que aceita ficar vazio (Nulo).
+    [Required]
+    [Range(0, 999)]
+    [Display(Name = "Quantity of Deliveries")]
+    public int Deliveries { get; set; }
+    
+    [Required]
+    [Range(0, 999)]
+    [Display(Name = "Quantity of Collections")]
+    public int Collections { get; set; }
+    
+    
+    [Required]
+    [Range(0, 999)]
+    [Display(Name = "Quantity of Retourns")]
+    public int Returns { get; set; }
+
+    [StringLength(500)]
+    [Display(Name = "Notes/Observations")]
     public string? Notes { get; set; }
+    
+    
+    [ForeignKey("DriverId")]
+    public ApplicationUser? User { get; set; }
+    
+    
+    // // Quantidade de mercadorias entregues com sucesso.
+    // public int DeliveriesCount { get; set; }
+    //
+    // // Quantidade de mercadorias recolhidas (Coletas).
+    // public int CollectionsCount { get; set; }
+    //
+    // // Quantidade de entregas que falharam (Retornos).
+    // public int RetournsCount {  get; set; }
+    //
+    // // Campo opcional para observações (ex: "Pneu furou", "Trânsito intenso").
+    // // O ponto de interrogação (string?) indica que aceita ficar vazio (Nulo).
+    // public string? Notes { get; set; }
 
     public DeliveryRecord()
     {

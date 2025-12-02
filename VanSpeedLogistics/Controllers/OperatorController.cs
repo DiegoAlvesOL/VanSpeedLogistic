@@ -73,9 +73,9 @@ public class OperatorController : Controller
         {
             DriverId = userId,
             Date = DateTime.Now,
-            DeliveriesCount = model.DeliveriesCount,
-            CollectionsCount = model.CollectionsCount,
-            RetournsCount = model.RetournsCount,
+            Deliveries = model.DeliveriesCount,
+            Collections = model.CollectionsCount,
+            Returns = model.RetournsCount,
             Notes = model.Notes
         };
         // o processo de gravar os dados no banco começar aqui onde estou escrevendo os dados na memória
