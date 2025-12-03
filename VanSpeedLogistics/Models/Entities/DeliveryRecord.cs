@@ -38,7 +38,7 @@ public class DeliveryRecord
     
     [Required]
     [Range(0, 999)]
-    [Display(Name = "Quantity of Retourns")]
+    [Display(Name = "Goods Returned")]
     public int Returns { get; set; }
 
     [StringLength(500)]
@@ -49,20 +49,6 @@ public class DeliveryRecord
     [ForeignKey("DriverId")]
     public ApplicationUser? User { get; set; }
     
-    
-    // // Quantidade de mercadorias entregues com sucesso.
-    // public int DeliveriesCount { get; set; }
-    //
-    // // Quantidade de mercadorias recolhidas (Coletas).
-    // public int CollectionsCount { get; set; }
-    //
-    // // Quantidade de entregas que falharam (Retornos).
-    // public int RetournsCount {  get; set; }
-    //
-    // // Campo opcional para observações (ex: "Pneu furou", "Trânsito intenso").
-    // // O ponto de interrogação (string?) indica que aceita ficar vazio (Nulo).
-    // public string? Notes { get; set; }
-
     public DeliveryRecord()
     {
         this.Date = DateTime.Now;

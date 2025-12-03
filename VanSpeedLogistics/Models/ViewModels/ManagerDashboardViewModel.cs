@@ -9,6 +9,7 @@ namespace VanSpeedLogistics.Models.ViewModels;
 /// </summary>
 public class ManagerDashboardViewModel
 {
+    public string? SelectedDriverId { get; set; }
     public int PreviousDayDeliveries { get; set; }
     public int PreviousDayCollections { get; set; }
     public int PreviousDayReturns { get; set; }

@@ -4,72 +4,72 @@
     ViewData["Title"] = "Register New Driver";
 }
 
-<!-- NOVO: Exibe a mensagem de sucesso se ela existir no TempData -->
+<!-- Success Message -->
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-        <strong>Success!</strong> @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="max-w-xl mx-auto mt-4 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-lg shadow-md" role="alert">
+        <p class="font-bold">Success!</p>
+        <p>@TempData["SuccessMessage"]</p>
     </div>
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-lg border-primary">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">
-                        <i class="bi bi-person-plus"></i> Register New Driver
-                    </h3>
-                </div>
-                <div class="card-body">
-                    
-                    @* O FORMULÁRIO: aponta para a Action POST (a ser implementada no próximo card) *@
-                    <form asp-controller="Account" asp-action="Register" method="post">
-                        
-                        <!-- asp-validation-summary: Exibe todos os erros de validação da ViewModel -->
-                        <div asp-validation-summary="All" class="text-danger mb-3"></div>
-
-                        <!-- Full Name: O Tag Helper <label asp-for> puxa o texto de [Display(Name="Full Name")] na ViewModel -->
-                        <div class="mb-3">
-                            <label asp-for="FullName" class="form-label"></label>
-                            <input asp-for="FullName" class="form-control" placeholder="Ex: John Doe" />
-                            <span asp-validation-for="FullName" class="text-danger"></span>
-                        </div>
-                        <!-- O que esse código faz: Cria a caixa de texto e associa a validação ao campo FullName. -->
-                        
-                        <!-- Email -->
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" type="email" placeholder="john.doe@vanspeed.com" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                        <!-- O que esse código faz: Cria a caixa de texto do Email. -->
-
-                        <!-- Password -->
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-                        <!-- O que esse código faz: Cria a caixa de senha (ocultando os caracteres). -->
-                        
-                        <!-- Confirm Password -->
-                        <div class="mb-4">
-                            <label asp-for="ConfirmPassword" class="form-label"></label>
-                            <input asp-for="ConfirmPassword" class="form-control" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                        </div>
-                        <!-- O que esse código faz: Cria a caixa de confirmação de senha. -->
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-plus-circle"></i> Create Driver Account
-                            </button>
-                        </div>
-                    </form>
-                </div>
+<div class="max-w-4xl mx-auto py-10">
+    <div class="w-full lg:w-3/5 xl:w-1/2 mx-auto">
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-[#9f1239] text-white p-6 flex justify-center">
+                <h3 class="text-2xl font-bold mb-0 flex items-center">
+                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 10H8m4 0a4 4 0 01-8 0m8 0v3m0-3h-3m3 0a4 4 0 01-8 0"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h-4a2 2 0 01-2-2v-2a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 01-2 2z"></path></svg>
+                    Register New Driver
+                </h3>
             </div>
+
+            <div class="p-8">
+                <form asp-controller="Account" asp-action="Register" method="post">
+                    <div asp-validation-summary="All"></div>
+
+                    <!-- Full Name -->
+                    <div class="mb-4">
+                        <label asp-for="FullName" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="FullName" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9f1239]/50 focus:border-[#9f1239] transition duration-150 shadow-sm" placeholder="Ex: John Doe" />
+                        <span asp-validation-for="FullName" class="text-sm text-red-500 mt-1 block"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label asp-for="Email" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Email" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9f1239]/50 focus:border-[#9f1239] transition duration-150 shadow-sm" type="email" placeholder="john.doe@vanspeed.com" />
+                        <span asp-validation-for="Email" class="text-sm text-red-500 mt-1 block"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-4">
+                        <label asp-for="Password" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="Password" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9f1239]/50 focus:border-[#9f1239] transition duration-150 shadow-sm" />
+                        <span asp-validation-for="Password" class="text-sm text-red-500 mt-1 block"></span>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mb-6">
+                        <label asp-for="ConfirmPassword" class="block text-sm font-medium text-gray-700 mb-1"></label>
+                        <input asp-for="ConfirmPassword" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9f1239]/50 focus:border-[#9f1239] transition duration-150 shadow-sm" />
+                        <span asp-validation-for="ConfirmPassword" class="text-sm text-red-500 mt-1 block"></span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="w-full py-3 px-6 rounded-xl shadow-md transition duration-300 font-semibold flex hover:scale-[1.01] items-center justify-center bg-[#9f1239] text-white hover:bg-[#7e0f2d]">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 10H8m4 0a4 4 0 01-8 0m8 0v3m0-3h-3m3 0a4 4 0 01-8 0"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h-4a2 2 0 01-2-2v-2a2 2 0 00-2-2H9a2 2 0 00-2 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 01-2 2z"></path></svg>
+                            Create Driver Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center">
+             <a asp-controller="Manager" asp-action="Index" class="text-[#9f1239] hover:text-[#7e0f2d] text-sm font-medium transition duration-150">
+                &larr; Return to Dashboard
+            </a>
         </div>
     </div>
 </div>

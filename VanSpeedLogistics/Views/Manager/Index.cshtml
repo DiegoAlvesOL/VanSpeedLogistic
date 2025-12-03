@@ -24,6 +24,7 @@
     <h1 class="text-3xl font-bold mb-8 text-gray-800">Fleet Management Dashboard</h1>
 
     
+    <!-- Seção de KPIs - Previous Day's Performance (Sem alteração de idioma) -->
     <h2 class="text-xl font-semibold mb-4 text-gray-700">KPIs - Previous Day's Performance</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
 
@@ -48,6 +49,54 @@
             <p class="text-xs text-gray-400 mt-2">Deliveries that failed and were returned.</p>
         </div>
     </div>
+    
+    <!-- ======================================================= -->
+    <!-- NOVO BLOCO: SEÇÃO DE FILTROS SIMPLIFICADA (Apenas Driver) -->
+    <!-- Layout ajustado: filtro compacto, botões alinhados à direita. -->
+    <!-- ======================================================= -->
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">Activity Log Filters</h2>
+    <div class="bg-white p-6 rounded-xl shadow-lg mb-10">
+        <!-- Flex container principal para alinhar itens e botões -->
+        <form asp-controller="Manager" asp-action="Index" method="get" class="flex flex-col md:flex-row gap-4 items-end w-full">
+            
+            <!-- Filtro de Motorista (Driver) - Largura controlada (max-w-sm) -->
+            <div class="w-full md:max-w-sm">
+                <label for="driverSelect" class="block text-sm font-medium text-gray-700 mb-1">Filter by Driver</label>
+                <!-- O ViewData["DriversList"] será preenchido pelo Controller no Card 12 -->
+                <select id="driverSelect" name="SelectedDriverId" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="">-- All Drivers --</option>
+                    
+                    @* O código Razor para listar os motoristas entrará aqui *@
+                    @if (ViewData["DriversList"] is SelectList drivers)
+                    {
+                        @foreach (var item in drivers)
+                        {
+                            <option value="@item.Value" selected="@(item.Selected ? "selected" : null)">@item.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+            
+            <!-- Container para os botões: usa ml-auto para empurrar para a direita no desktop -->
+            <div class="flex gap-4 w-full md:w-auto md:ml-auto">
+                <!-- Botão de Busca/Filtro -->
+                <button type="submit" class="w-1/2 md:w-auto py-2 px-4 h-10 rounded-xl shadow-md transition duration-300 font-semibold flex-shrink-0 flex items-center justify-center bg-gray-600 text-white hover:bg-gray-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    <span class="ml-2 hidden sm:inline">Apply Filters</span>
+                </button>
+                
+                <!-- Botão de Reset -->
+                <a asp-action="Index" class="w-1/2 md:w-auto py-2 px-4 h-10 rounded-xl shadow-md transition duration-300 font-semibold flex-shrink-0 flex items-center justify-center bg-red-500 text-white hover:bg-red-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 0h-4.582"></path></svg>
+                    <span class="ml-2 hidden sm:inline">Reset</span>
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- ======================================================= -->
+    <!-- FIM DO NOVO BLOCO DE FILTROS -->
+    <!-- ======================================================= -->
     
     
     <div class="flex justify-between items-center mb-4">

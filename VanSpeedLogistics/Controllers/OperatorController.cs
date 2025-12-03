@@ -42,7 +42,7 @@ public class OperatorController : Controller
             return NotFound("Usuário não encontrado");
         }
 
-        // Montamos uma consulta SQL usando C# (LINQ)
+        // Montamos uma consulta LINQ para buscar o histórico do usuário (últimos 10 registros)
         var userHistory = await _context.DeliveryRecords
             .Where(r => r.DriverId == user.Id)
             .OrderByDescending(r => r.Date)
@@ -51,6 +51,7 @@ public class OperatorController : Controller
         
         ViewBag.History = userHistory;
         
+        // Retorna a View (sem model na requisição GET, o model é criado vazio)
         return View();
 
     }
@@ -60,10 +61,26 @@ public class OperatorController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Index(DeliveryViewModel model)
     {
+        // 1. CORREÇÃO DE VALIDAÇÃO: Se o modelo for inválido, precisamos recarregar o ViewBag.History
+        // Se a validação falhar, a View precisa do ViewBag.History para evitar que a tabela de histórico desapareça.
         if (!ModelState.IsValid)
         {
-            return View("Index");
+            // OBTEM O USUÁRIO E O HISTÓRICO NOVAMENTE
+            var user = await _userManager.GetUserAsync(User);
+            
+            var userHistory = await _context.DeliveryRecords
+                .Where(r => r.DriverId == user.Id)
+                .OrderByDescending(r => r.Date)
+                .Take(10)
+                .ToListAsync();
+            
+            ViewBag.History = userHistory;
+            
+            // Retorna a View COM o model (para que as mensagens de erro sejam exibidas)
+            return View("Index", model);
         }
+        
+        // -- Lógica de Sucesso --
         
         // Identificando quem é o motorista logado
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -73,20 +90,24 @@ public class OperatorController : Controller
         {
             DriverId = userId,
             Date = DateTime.Now,
-            Deliveries = model.DeliveriesCount,
-            Collections = model.CollectionsCount,
-            Returns = model.RetournsCount,
+            Deliveries = model.Deliveries,
+            Collections = model.Collections,
+            Returns = model.Returns,
             Notes = model.Notes
         };
-        // o processo de gravar os dados no banco começar aqui onde estou escrevendo os dados na memória
+        
         _context.DeliveryRecords.Add(record);
         
-        // Esse trecho commita a transação no MySQL, gerando o insert into.
+        // Commita a transação no MySQL.
         await _context.SaveChangesAsync();
         
-        // Redirecionando o usuário par auma página de sucesso.
-        TempData["SuccessMessage"] = "Record added successfully";
-        return RedirectToAction("Index", "Home");
+        // Define a mensagem de sucesso que será lida pelo TempData na View
+        TempData["SuccessMessage"] = "Registro diário salvo com sucesso!";
+        
+        // 2. CORREÇÃO DE REDIRECIONAMENTO: Redireciona para o Index deste Controller
+        // O RedirectToAction dispara o método [HttpGet] Index() (que recarrega a página)
+        // e garante que o TempData["SuccessMessage"] seja exibido na página correta.
+        return RedirectToAction(nameof(Index)); // Equivalente a RedirectToAction("Index")
     }
     
 }

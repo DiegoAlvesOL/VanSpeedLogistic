@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VanSpeedLogistics.Data;
 using Microsoft.EntityFrameworkCore;
 using VanSpeedLogistics.Models.ViewModels;
+using VanSpeedLogistics.Models.Entities;
 using ClosedXML.Excel;
 using System.IO;
-
-
+using Microsoft.AspNetCore.Mvc.Rendering;
+using VanSpeedLogistics.Models;
 
 
 namespace VanSpeedLogistics.Controllers;
@@ -21,26 +23,29 @@ public class ManagerController : Controller
 {
     private readonly ApplicationDbContext _context;
 
-    /// <summary>
-    /// Construtor que recebe o ApplicationDbContext por Injeção de Dependência.
-    /// Isso permite que o Controller acesse todas as tabelas e dados do sistema.
-    /// </summary>
-    /// <param name="context">O contexto do banco de dados.</param>
-    public ManagerController(ApplicationDbContext context)
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public ManagerController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
     }
-
+    
     /// <summary>
     /// Action Index (GET) que serve como o Dashboard principal do Gestor.
     /// Por enquanto, apenas exibe a View, mas será o ponto de partida para os KPIs.
     /// </summary>
     /// <returns>A View Index, que será o Dashboard.</returns>
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? SelectedDriverId)
     {
+        var drivers = await _userManager.GetUsersInRoleAsync("Operator");
+        ViewData["DriversList"] = new SelectList(drivers.OrderBy(u => u.FullName),
+            nameof(ApplicationUser.Id),
+            nameof(ApplicationUser.FullName),
+            SelectedDriverId);
+        
         // Definição do Intervalo de Tempo (Dia Anterior)
         // Os operadores postam no final do dia, então os KPIs se referem ao dia anterior (Yesterday).
-        
         // Pega a data de hoje (meia-noite)
         var today = DateTime.Today;
         
@@ -66,18 +71,25 @@ public class ManagerController : Controller
 
         viewModel.PreviousDayReturns = await previousDayRecords
             .SumAsync(r => r.Returns);
-        
-        // Consulta do Log de Atividades Recentes
-        // Busca os 20 últimos registros da frota, ordenados de forma decrescente
-        // Inclui o ApplicationUser (propriedade User) para ter acesso ao FullName do operador no Log
-        viewModel.RecentActivityLog = await _context.DeliveryRecords
+
+        var activityQuery = _context.DeliveryRecords
             .Include(r => r.User)
             .OrderByDescending(r => r.Date)
-            .Take(20)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(SelectedDriverId))
+        {
+            activityQuery = activityQuery.Where(r => r.DriverId == SelectedDriverId);
+        }
+
+        viewModel.RecentActivityLog = await activityQuery
+            .Take(100)
             .ToListAsync();
-        
-        // Passa a ViewModel preenchida para a View
+
+
+        viewModel.SelectedDriverId = SelectedDriverId;
         return View(viewModel);
+        
     }
 
     /// <summary>

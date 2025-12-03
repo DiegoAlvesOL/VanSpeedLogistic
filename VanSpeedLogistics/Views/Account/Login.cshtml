@@ -1,39 +1,64 @@
 @model VanSpeedLogistics.Models.LoginViewModel
 
 @{
-    ViewData["Title"] = "Entrar no Sistema";
+    ViewData["Title"] = "System Login";
+    // Os estilos de input (input-text) e botão (btn-primary) estão definidos no _Layout.cshtml.
 }
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">Login VanSpeed</h4>
+<!-- 
+    CORREÇÃO DE LAYOUT: 
+    1. 'flex items-center justify-center': Centra o card no meio da tela (vertical e horizontal).
+    2. 'min-h-[calc(100vh-8rem)]': Garante que a área de conteúdo tenha altura suficiente para empurrar o rodapé para a base da página.
+-->
+<div class="flex items-center justify-center min-h-[calc(100vh-8rem)] py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Login Card -->
+    <div class="w-full max-w-md">
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
+            
+            <!-- Header (Brand Color) -->
+            <div class="bg-brand-primary text-white p-6 rounded-t-xl">
+                <h4 class="text-2xl font-semibold text-center">VanSpeed Login</h4>
             </div>
-            <div class="card-body">
+            
+            <!-- Form Body -->
+            <div class="p-8">
                 <form asp-action="Login" method="post">
-                    <!-- Mostra erros gerais (ex: senha errada) -->
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <!-- Display general errors (e.g., wrong password) -->
+                    <div asp-validation-summary="ModelOnly" class="text-kpi-alert bg-red-100 border border-red-400 p-3 rounded-lg mb-4"></div>
 
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label">E-mail</label>
-                        <input asp-for="Email" class="form-control" placeholder="ex: peter@vanspeed.com" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
+                    <div class="mb-5">
+                        <label asp-for="Email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <div class="mt-1">
+                            
+                            
+                            <input asp-for="Email" 
+                                   class="block w-full text-lg(18px) rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary" 
+                                   placeholder="e.g., peter@vanspeed.com" />
+                            <span asp-validation-for="Email" class="text-kpi-alert text-sm mt-1 block"></span>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label">Senha</label>
-                        <input asp-for="Password" class="form-control" placeholder="******" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
+                    <div class="mb-5">
+                        <label asp-for="Password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <div class="mt-1">
+                            
+                            <input asp-for="Password" 
+                                   class="block w-full text-lg rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/50 focus:border-brand-primary" 
+                                   placeholder="******" />
+                            <span asp-validation-for="Password" class="text-kpi-alert text-sm mt-1 block"></span>
+                        </div>
                     </div>
 
-                    <div class="mb-3 form-check">
-                        <input class="form-check-input" asp-for="RememberMe" />
-                        <label class="form-check-label" asp-for="RememberMe"></label>
+                    <div class="flex items-center mb-6">
+                        <input type="checkbox" asp-for="RememberMe" class="h-4 w-4 text-brand-primary border-gray-300 rounded focus:ring-rose-500" />
+                        <label class="ml-2 block text-sm text-gray-900" asp-for="RememberMe">Remember me?</label>
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">Entrar</button>
+                        <button type="submit" class="w-full btn-primary text-lg transition duration-200 ease-in-out transform hover:scale-[1.01] shadow-lg hover:shadow-xl">
+                            Login
+                        </button>
                     </div>
                 </form>
             </div>

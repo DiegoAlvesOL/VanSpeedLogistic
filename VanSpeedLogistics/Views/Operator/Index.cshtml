@@ -1,117 +1,152 @@
-@* 1. DEFINIÇÃO DO MODELO 
-   Esta linha conecta o HTML com o C#. Agora o HTML sabe que deve esperar 
-   os campos da classe DeliveryViewModel. 
-*@
+@* 1. MODEL DEFINITION *@
 @model VanSpeedLogistics.Models.DeliveryViewModel
 
 @{
-    ViewData["Title"] = "Daily Release";
+    ViewData["Title"] = "Daily Log";
+    // Cor da Marca Personalizada (Bordô)
+    var brandColor = "#9f1239"; 
+    var brandColorDark = "#7e0f2d"; // Tom mais escuro para o hover/sombra
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
+<!-- 
+    2. MESSAGE BLOCK: Exibe mensagens de sucesso. 
+    Mantido em verde (cor universal para sucesso) para melhor UX.
+-->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="max-w-4xl mx-auto p-4 mb-6 bg-green-100 border border-green-400 text-green-700 rounded-lg text-center font-medium flex items-center justify-center" role="alert">
+        <i class="ri-check-line text-xl mr-2"></i>
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<!-- LAYOUT: Centralização Horizontal -->
+<div class="max-w-4xl mx-auto">
+    
+    <!-- CARD: DAILY LOG FORM -->
+    <div class="w-full lg:w-3/5 xl:w-1/2 mx-auto mb-12">
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
             
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="bi bi-truck"></i> Daily Log</h4>
-                </div>
-                <div class="card-body">
-                    
-                    @* 2. O FORMULÁRIO 
-                       asp-action="Index": Envia os dados para a Action 'Index' (no Controller).
-                       method="post": Envia os dados de forma oculta (padrão para salvar dados).
-                    *@
-                    <form asp-action="Index" method="post">
-                        
-                        <!-- Resumo de Erros (caso o usuário deixe algo em branco) -->
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                        <!-- Campo: Entregas -->
-                        <div class="mb-3">
-                            <label asp-for="DeliveriesCount" class="form-label fw-bold"></label>
-                            <input asp-for="DeliveriesCount" class="form-control form-control-lg" type="number" />
-                            <span asp-validation-for="DeliveriesCount" class="text-danger"></span>
-                        </div>
-
-                        <!-- Campo: Coletas -->
-                        <div class="mb-3">
-                            <label asp-for="CollectionsCount" class="form-label fw-bold"></label>
-                            <input asp-for="CollectionsCount" class="form-control form-control-lg" type="number" />
-                            <span asp-validation-for="CollectionsCount" class="text-danger"></span>
-                        </div>
-
-                        <!-- Campo: Retornos -->
-                        <div class="mb-3">
-                            <label asp-for="RetournsCount" class="form-label fw-bold"></label>
-                            <input asp-for="RetournsCount" class="form-control form-control-lg" type="number" />
-                            <span asp-validation-for="RetournsCount" class="text-danger"></span>
-                        </div>
-
-                        <!-- Campo: Notas -->
-                        <div class="mb-3">
-                            <label asp-for="Notes" class="form-label"></label>
-                            <textarea asp-for="Notes" class="form-control" rows="3" placeholder="Ex: Flat tire, customer absent..."></textarea>
-                            <span asp-validation-for="Notes" class="text-danger"></span>
-                        </div>
-
-                        <!-- Botão de Salvar -->
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                Save Record
-                            </button>
-                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
-                        </div>
-
-                    </form>
-                </div>
+            <!-- 
+                HEADER CORRIGIDO: 
+                - Usa a cor personalizada bg-[#9f1239]
+                - Conteúdo centralizado
+            -->
+            <div class="bg-[#9f1239] text-white p-6 rounded-t-xl flex justify-center">
+                <h4 class="text-2xl font-semibold mb-0 flex items-center">
+                    <i class="ri-truck-line text-3xl mr-3"></i> Daily Log Submission
+                </h4>
             </div>
+            
+            <div class="p-8">
+                @* 3. O FORMULÁRIO *@
+                <form asp-action="Index" method="post">
+                        
+                    <!-- Error Summary -->
+                    <div asp-validation-summary="ModelOnly" class="text-kpi-alert bg-red-100 border border-red-400 p-3 rounded-lg mb-5"></div>
 
+                    <!-- Field: Deliveries (Focus ring usa a cor da marca) -->
+                    <div class="mb-5">
+                        <label asp-for="Deliveries" class="block text-sm font-semibold text-gray-700 mb-1">Deliveries Count</label>
+                        <input asp-for="Deliveries" class="input-text w-full p-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9f1239]/50 focus:border-[#9f1239]" type="number" min="0" placeholder="0" />
+                        <span asp-validation-for="Deliveries" class="text-kpi-alert text-sm mt-1 block"></span>
+                    </div>
+
+                    <!-- Field: Collections (Focus ring usa a cor da marca) -->
+                    <div class="mb-5">
+                        <label asp-for="Collections" class="block text-sm font-semibold text-gray-700 mb-1">Collections Count</label>
+                        <input asp-for="Collections" class="input-text w-full p-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9f1239]/50 focus:border-[#9f1239]" type="number" min="0" placeholder="0" />
+                        <span asp-validation-for="Collections" class="text-kpi-alert text-sm mt-1 block"></span>
+                    </div>
+
+                    <!-- Field: Returns (Focus ring usa a cor da marca) -->
+                    <div class="mb-5">
+                        <label asp-for="Returns" class="block text-sm font-semibold text-gray-700 mb-1">Returns Count</label>
+                        <input asp-for="Returns" class="input-text w-full p-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9f1239]/50 focus:border-[#9f1239]" type="number" min="0" placeholder="0" />
+                        <span asp-validation-for="Returns" class="text-kpi-alert text-sm mt-1 block"></span>
+                    </div>
+
+                    <!-- Field: Notes (Focus ring usa a cor da marca) -->
+                    <div class="mb-8">
+                        <label asp-for="Notes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                        <textarea asp-for="Notes" class="input-text w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#9f1239]/50 focus:border-[#9f1239]" rows="3" placeholder="e.g., Flat tire, customer absent, mechanical issue..."></textarea>
+                        <span asp-validation-for="Notes" class="text-kpi-alert text-sm mt-1 block"></span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <!-- Botão de Ação Principal (SAVE) com cor e hover personalizados -->
+                        <button type="submit" class="w-full bg-[#9f1239] text-white font-bold py-3 rounded-lg text-lg transition duration-200 ease-in-out transform hover:scale-[1.01] shadow-lg hover:shadow-xl hover:bg-[#7e0f2d]">
+                            <i class="ri-save-line mr-2"></i> Save Record
+                        </button>
+                        <a asp-controller="Home" asp-action="Index" class="w-full block text-center border border-gray-300 text-gray-700 font-medium py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-150">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
 
-<hr class="my-5" /> <!-- Uma linha divisória para separar visualmente -->
+    <hr class="my-10 border-gray-200" /> 
 
-<!-- SEÇÃO DE HISTÓRICO -->
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <h4 class="mb-3 text-secondary"><i class="bi bi-clock-history"></i> My Latest Releases</h4>
+    <!-- HISTORY SECTION -->
+    <div>
+        <h4 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center">
+            <i class="ri-history-line mr-2"></i> My Latest Records
+        </h4>
 
-        <div class="table-responsive">
-            <table class="table table-striped table-hover shadow-sm border">
-                <thead class="table-dark">
+        <div class="bg-white rounded-xl shadow-lg overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th>Data/Time</th>
-                        <th class="text-center">Deliveries</th>
-                        <th class="text-center">Collections</th>
-                        <th class="text-center">Returns</th>
-                        <th>Notes</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Date/Time
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Deliveries
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Collections
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Returns
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Notes
+                        </th>
                     </tr>
                 </thead>
-                <tbody>
-                    @* LÓGICA DE EXIBIÇÃO:
-                       Aqui verificamos se existe algo na ViewBag.History.
-                       Se existir, fazemos um loop (foreach) para criar uma linha (tr)
-                       para cada registro encontrado.
-                    *@
+                <tbody class="bg-white divide-y divide-gray-200">
                     @if (ViewBag.History != null)
                     {
-                        // Precisamos dizer ao Razor que isso é uma lista de DeliveryRecord
-                        // para ele entender os campos (.Date, .DeliveriesCount, etc)
+                        // We must tell Razor this is a list of DeliveryRecord
                         foreach (var item in (List<VanSpeedLogistics.Models.Entities.DeliveryRecord>)ViewBag.History)
                         {
-                            <tr>
-                                <!-- Exibe a data formatada (Dia/Mês/Ano Hora:Minuto) -->
-                                <td>@item.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                            <tr class="hover:bg-gray-50">
+                                <!-- Display formatted date (Day/Month/Year Hour:Minute) -->
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    @item.Date.ToString("dd/MM/yyyy HH:mm")
+                                </td>
                                 
-                                <td class="text-center text-success fw-bold">@item.Deliveries</td>
-                                <td class="text-center text-primary">@item.Collections</td>
-                                <td class="text-center text-danger">@item.Returns</td>
+                                <!-- Deliveries (Success: Green - mantido verde para valor positivo) -->
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-kpi-success font-bold">
+                                    @item.Deliveries
+                                </td>
                                 
-                                <!-- Exibe a nota ou um traço se estiver vazia -->
-                                <td class="text-muted small">
+                                <!-- Collections (Warning: Amber - mantido para cor de alerta/neutra) -->
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-kpi-warning font-bold">
+                                    @item.Collections
+                                </td>
+                                
+                                <!-- Returns (Alert: Red - mantido para cor de alerta/negativo) -->
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-kpi-alert font-bold">
+                                    @item.Returns
+                                </td>
+                                
+                                <!-- Notes -->
+                                <td class="px-6 py-4 whitespace-normal text-sm text-gray-700 max-w-xs">
                                     @(string.IsNullOrEmpty(item.Notes) ? "-" : item.Notes)
                                 </td>
                             </tr>
@@ -120,7 +155,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-3">
+                            <td colspan="5" class="text-center text-gray-500 py-4">
                                 No records found.
                             </td>
                         </tr>
@@ -132,10 +167,7 @@
 </div>
 
 
-@* 3. SCRIPTS DE VALIDAÇÃO 
-   Isso ativa a validação no lado do cliente (Javascript). 
-   O usuário vê o erro antes mesmo de enviar para o servidor.
-*@
+@* 4. VALIDATION SCRIPTS *@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

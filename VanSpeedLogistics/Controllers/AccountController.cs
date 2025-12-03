@@ -43,6 +43,12 @@ public class AccountController : Controller
         return View(model);
     }
 
+    [HttpGet]
+    public IActionResult AccessDenied()
+    {
+        return View();
+    }
+
     /// <summary>
     /// Action Register (GET): Exibe o formulário de cadastro de novo motorista.
     /// A restrição [Authorize(Roles = "Manager")] garante que apenas usuários com a role Manager acessem esta rota.

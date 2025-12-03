@@ -1,9 +1,10 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VanSpeedLogistics.Models;
 
-namespace VanSpeedLogistics.Controllers;
 
+[Authorize]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
@@ -13,11 +14,23 @@ public class HomeController : Controller
         _logger = logger;
     }
 
+    
     public IActionResult Index()
     {
-        return View();
+        if (User.IsInRole("Manager"))
+        {
+            return RedirectToAction("Index", "Manager");
+        }
+        
+        if (User.IsInRole("Operator"))
+        {
+            return RedirectToAction("Index", "Operator");
+        }
+        
+        return RedirectToAction("Index", "Manager");
     }
 
+    
     public IActionResult Privacy()
     {
         return View();

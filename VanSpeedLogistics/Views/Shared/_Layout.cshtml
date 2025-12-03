@@ -1,62 +1,172 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using VanSpeedLogistics.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    // Get the currently logged-in user
+    var currentUser = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
+    var fullName = currentUser?.FullName ?? User.Identity.Name;
+    
+    // View control variables
+    var isManager = User.IsInRole("Manager");
+    var isOperator = User.IsInRole("Operator");
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@ViewData["Title"] - VanSpeedLogistics</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/VanSpeedLogistics.styles.css" asp-append-version="true"/>
-</head>
-<body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">VanSpeedLogistics</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
-                    @if (User.IsInRole("Manager"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark font-semibold text-indigo-600 border border-indigo-400 rounded-lg px-3 py-1 mr-2 hover:bg-indigo-50 transition"
-                               asp-area="" 
-                               asp-controller="Manager" 
-                               asp-action="Index">
-                                Manager Area
-                            </a>
-                        </li>
-                    }
-                </ul>
-                <partial name="_LoginPartial"/>
-            </div>
-        </div>
-    </nav>
-</header>
-<div class="container">
-    <main role="main" class="pb-3">
-        @RenderBody()
-    </main>
-</div>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - VanSpeed Logistics</title>
+    
+    <!-- Link to the Tailwind CSS library -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Link for icons (Remix Icons) -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    
+    <!-- START OF STYLES BLOCK: VARIABLE COLOR PALETTE -->
+    <style>
+        /* ------------------------------------------------ */
+        /* 1. GLOBAL CSS VARIABLES (EASY TO CHANGE)       */
+        /* ------------------------------------------------ */
+        :root {
+            /* Brand Colors (Based on the red/wine logo) */
+            --color-brand-primary: #be123c; /* Rose-700 (Primary/Buttons) */
+            --color-brand-accent: #374151;  /* Gray-700 (Text/Highlight) */
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - VanSpeedLogistics - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            /* Status Colors for KPIs and Messages */
+            --color-kpi-success: #22c55e;   /* Green-600 (Deliveries/Success) */
+            --color-kpi-warning: #f59e0b;   /* Amber-500 (Collections/Warning) */
+            --color-kpi-alert: #dc2626;     /* Red-600 (Returns/Error) */
+            
+            /* Main background */
+            --color-bg-light: #f9fafb;      /* Gray-50 */
+        }
+        
+        /* ------------------------------------------------ */
+        /* 2. UTILITY CLASSES BASED ON VARIABLES          */
+        /* ------------------------------------------------ */
+        .bg-brand-primary {
+            background-color: var(--color-brand-primary);
+        }
+        .text-brand-primary {
+            color: var(--color-brand-primary);
+        }
+        .bg-kpi-success {
+            background-color: var(--color-kpi-success);
+        }
+        .text-kpi-success {
+            color: var(--color-kpi-success);
+        }
+        .text-kpi-warning {
+            color: var(--color-kpi-warning);
+        }
+        .text-kpi-alert {
+            color: var(--color-kpi-alert);
+        }
+        
+        /* Styling for Primary Buttons */
+        .btn-primary {
+            background-color: var(--color-brand-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #9f1239; 
+        }
+        /* Styling for Form Inputs */
+        .input-text {
+            
+            @@apply block w-full rounded-lg border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500;
+        }
+    </style>
+    <!-- END OF STYLES BLOCK -->
+</head>
+<body class="bg-gray-50 font-sans flex flex-col min-h-screen">
+    
+    <!-- MAIN NAVIGATION BAR (NAVBAR) -->
+    <header class="bg-brand-primary shadow-lg sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                
+                <!-- Logo -->
+                <a class="flex-shrink-0" asp-area="" asp-controller="Home" asp-action="Index">
+                    <!-- O logo foi atualizado para apontar para o seu arquivo local 'VanSpeed.png' na pasta wwwroot/images/ -->
+                    <img class="h-8 w-auto" 
+                         src="~/images/logo.png" 
+                         alt="VanSpeed Logistics Logo"/>
+                </a>
+
+                <!-- Main Navigation (Visible on Desktop) -->
+                <div class="flex items-center">
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            
+                            @if (isOperator)
+                            {
+                                <a asp-area="" asp-controller="Operator" asp-action="Index" 
+                                   class="text-white hover:bg-rose-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                                    <i class="ri-truck-line mr-1"></i> Daily Log
+                                </a>
+                            }
+                            
+                            @if (isManager)
+                            {
+                                <a asp-area="" asp-controller="Manager" asp-action="Index" 
+                                   class="text-white hover:bg-rose-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                                    <i class="ri-dashboard-line mr-1"></i> Dashboard
+                                </a>
+                                
+                                <a asp-area="" asp-controller="Account" asp-action="Register" 
+                                   class="text-white hover:bg-rose-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                                    <i class="ri-user-add-line mr-1"></i> New Driver
+                                </a>
+                            }
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile and Logout -->
+                <div class="flex items-center ml-auto">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <span class="text-white text-sm font-medium mr-4 hidden sm:block">
+                            <i class="ri-user-line mr-1"></i> Hello, @fullName
+                        </span>
+                        
+                        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+                            <button type="submit" class="text-white bg-rose-800 hover:bg-rose-900 px-3 py-1 rounded-md text-sm font-medium transition duration-150">
+                                <i class="ri-logout-box-r-line mr-1"></i> Logout
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="text-white hover:bg-rose-600 px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                            Login
+                        </a>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- MAIN PAGE CONTENT -->
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 flex-grow">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
     </div>
-</footer>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-@await RenderSectionAsync("Scripts", required: false)
+
+    <!-- FOOTER -->
+    <footer class="border-t mt-12 py-4 text-center text-sm text-gray-500 bg-white">
+        &copy; @DateTime.Now.Year - VanSpeed Logistics - All rights reserved.
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
