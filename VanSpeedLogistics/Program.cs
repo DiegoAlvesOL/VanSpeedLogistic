@@ -38,11 +38,22 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    
-    await DbInitializer.SeedRolesAsync(roleManager);
-    await DbInitializer.SeedUsersAsync(userManager);
+    var context = services.GetRequiredService<ApplicationDbContext>();
+
+    try
+    {
+        await context.Database.MigrateAsync();
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        await DbInitializer.SeedRolesAsync(roleManager);
+        await DbInitializer.SeedUsersAsync(userManager);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred seeding the DB.");
+    }
 }
 
 
