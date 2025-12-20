@@ -26,37 +26,40 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         options.SignIn.RequireConfirmedAccount = true;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
-    // .AddDefaultUI();//
     .AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
 
+
 var app = builder.Build();
 
-
+// Bloco de Automação do Banco de Dados
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
-    var context = services.GetRequiredService<ApplicationDbContext>();
-
-    try
+    
+    try 
     {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        
+        // Executa as instruções das Migrations
         await context.Database.MigrateAsync();
+
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-
+        
+        // Alimenta o banco com dados iniciais (Seeding)
         await DbInitializer.SeedRolesAsync(roleManager);
         await DbInitializer.SeedUsersAsync(userManager);
+
+        Console.WriteLine(">>> SUCESSO: Banco de dados sincronizado e Usuários iniciais criados.");
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred seeding the DB.");
+        logger.LogError(ex, ">>> ERRO: Falha ao inicializar o banco de dados.");
     }
 }
-
-
 
 // Configure o pipeline de requisição HTTP (Middleware)
 if (app.Environment.IsDevelopment())
@@ -70,18 +73,16 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
 app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+        pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages()
-    .WithStaticAssets();
+app.MapRazorPages();
 
 app.Run();
